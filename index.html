@@ -339,6 +339,17 @@
         display: none;
       }
 
+      .api-info {
+        background: rgba(108, 170, 35, 0.1);
+        border: 1px solid rgba(108, 170, 35, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem;
+        text-align: center;
+        color: var(--accent-light);
+        display: none;
+      }
+
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -369,6 +380,10 @@
 
       /* Responsive adjustments */
       @media (max-width: 480px) {
+        .weather-app {
+          max-width: 95%;
+        }
+        
         .weather-header {
           flex-direction: column;
           gap: 1rem;
@@ -463,6 +478,11 @@
           <div>Unable to load weather data. Using demo data instead.</div>
         </div>
 
+        <div class="api-info" id="apiInfo">
+          <i class="fas fa-info-circle"></i>
+          <div>Using demo data. To get real-time weather, add your OpenWeatherMap API key.</div>
+        </div>
+
         <div class="current-weather">
           <div class="weather-icon">
             <i class="fas fa-cloud-sun" id="weatherIcon"></i>
@@ -528,7 +548,7 @@
     <script>
       // ========== CONFIGURATION ==========
       // ADD YOUR OPENWEATHERMAP API KEY HERE
-      const OPENWEATHER_API_KEY = "c1c01729873f0e9cf46562c22d97f3de"; // Replace with your actual API key
+      const OPENWEATHER_API_KEY = "c1c01729873f0e9cf46562c22d97f3de"; // Leave empty to use demo data
 
       // Comprehensive city coordinates for Meghalaya
       const cityCoordinates = {
@@ -568,6 +588,7 @@
       const loadingIndicator = document.getElementById("loadingIndicator");
       const mapFrame = document.getElementById("mapFrame");
       const errorMessage = document.getElementById("errorMessage");
+      const apiInfo = document.getElementById("apiInfo");
 
       // Function to generate OpenStreetMap iframe
       function generateMapIframe(city) {
@@ -659,14 +680,10 @@
       // Get weather data from OpenWeatherMap API
       async function getWeatherData(city) {
         // If no API key is set, use mock data
-        if (
-          OPENWEATHER_API_KEY === "c1c01729873f0e9cf46562c22d97f3de" ||
-          !OPENWEATHER_API_KEY
-        ) {
-          console.warn(
-            "Using mock data - Please add your OpenWeatherMap API key"
-          );
-          errorMessage.style.display = "block";
+        if (!OPENWEATHER_API_KEY) {
+          console.info("Using mock data - Please add your OpenWeatherMap API key");
+          apiInfo.style.display = "block";
+          errorMessage.style.display = "none";
           return getMockData(city);
         }
 
@@ -685,6 +702,7 @@
 
           // Hide error message if previously shown
           errorMessage.style.display = "none";
+          apiInfo.style.display = "none";
 
           return {
             temp: Math.round(data.main.temp),
@@ -697,6 +715,7 @@
         } catch (error) {
           console.error("Error fetching weather data:", error);
           errorMessage.style.display = "block";
+          apiInfo.style.display = "none";
           // Fallback to mock data if API fails
           return getMockData(city);
         }
